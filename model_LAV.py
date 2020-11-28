@@ -316,13 +316,16 @@ class Model_LAV(nn.Module):
 
         # Classification layers
         self.proj_norm = LayerNorm(2 * args.hidden_size)
+
+
+    def add_classification_head(self):
         if self.args.task == "sentiment":
             if self.args.task_binary:
-                self.proj = nn.Linear(2 * args.hidden_size, 2)
+                self.proj = nn.Linear(2 * self.args.hidden_size, 2)
             else:
-                self.proj = nn.Linear(2 * args.hidden_size, 7)
+                self.proj = nn.Linear(2 * self.args.hidden_size, 7)
         if self.args.task == "emotion":
-            self.proj = self.proj = nn.Linear(2 * args.hidden_size, 6)
+            self.proj = self.proj = nn.Linear(2 * self.args.hidden_size, 6)
 
     def forward(self, x, y, z):
         x_mask = make_mask(x.unsqueeze(2))

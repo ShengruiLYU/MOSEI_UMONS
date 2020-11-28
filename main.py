@@ -3,11 +3,13 @@ import torch
 from torch.utils.data import DataLoader
 from mosei_dataset import Mosei_Dataset
 from meld_dataset import Meld_Dataset
+from pretrain_dataset import PretrainDataset
 from model_LA import Model_LA
 from model_LAV import Model_LAV
 from train import train
 import numpy as np
 from utils.compute_args import compute_args
+import glob
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -44,9 +46,11 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=random.randint(0, 9999999))
 
     # Dataset and task
-    parser.add_argument('--dataset', type=str, choices=['MELD', 'MOSEI'], default='MOSEI')
+    parser.add_argument('--dataset', type=str, choices=['MELD', 'MOSEI', 'PRE'], default='MOSEI')
     parser.add_argument('--task', type=str, choices=['sentiment', 'emotion'], default='sentiment')
     parser.add_argument('--task_binary',default=False, action='store_true')
+    parser.add_argument('--pretrain',default=False, action='store_true')
+
 
     args = parser.parse_args()
     return args
@@ -76,6 +80,19 @@ if __name__ == '__main__':
     # Create Checkpoint dir
     if not os.path.exists(os.path.join(args.output, args.name)):
         os.makedirs(os.path.join(args.output, args.name))
+
+    if args.pretrain:
+        ckpts = sorted(glob.glob(os.path.join('./pretrained','best*')), reverse=True)
+        state_dict = torch.load(ckpts[0])['state_dict']
+        del state_dict['proj.weight']
+        del state_dict['proj.bias']
+        net.load_state_dict(state_dict)
+        net.add_classification_head()
+
+        net = net.cuda()
+    else:
+        net.add_classification_head()
+        net = net.cuda()
 
     # Run training
     eval_accuracies = train(net, train_loader, eval_loader, args)

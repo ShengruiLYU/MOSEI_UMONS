@@ -2,3 +2,7 @@ data/
 utils/__pycache__/
 .ipynb_checkpoints/
 *.json
+en_vectors_web_lg-2.1.0.tar.gz
+__pycache__/
+ckpt/
+pretrained/

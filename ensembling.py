@@ -53,6 +53,8 @@ if __name__ == '__main__':
 
     # Creating net
     net = eval(args.model)(args, train_dset.vocab_size, train_dset.pretrained_emb).cuda()
+    net.add_classification_head()
+    net = net.cuda()
 
     # Ensembling sets
     ensemble_preds = {set: {} for set in evaluation_sets}

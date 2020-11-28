@@ -86,7 +86,7 @@ class Mosei_Dataset(Dataset):
                 Y[Y > 0] = 1
                 y = Y
 
-        return key, torch.from_numpy(L), torch.from_numpy(A), torch.from_numpy(V).float(), torch.from_numpy(y)
+        return key, torch.from_numpy(L), torch.from_numpy(A), torch.from_numpy(V).float(), torch.from_numpy(y).long()
 
     def __len__(self):
         return len(self.set)
