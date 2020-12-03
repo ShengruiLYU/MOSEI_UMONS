@@ -1,4 +1,5 @@
 import math
+from math import cos
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -327,6 +328,10 @@ class Model_LAV(nn.Module):
         if self.args.task == "emotion":
             self.proj = self.proj = nn.Linear(2 * self.args.hidden_size, 6)
 
+    def L2_distance(self, x, y):
+        diff = torch.sub(x, y)
+        return torch.norm(diff)
+
     def forward(self, x, y, z):
         x_mask = make_mask(x.unsqueeze(2))
         y_mask = make_mask(y)
@@ -363,8 +368,12 @@ class Model_LAV(nn.Module):
 
 
         # Classification layers
-        proj_feat = x + y + z
-        proj_feat = self.proj_norm(proj_feat)
-        ans = self.proj(proj_feat)
+        if self.args.dataset == "PRE_SIM":
+            cosine = nn.CosineSimilarity()
+            ans = self.L2_distance(x, y) + self.L2_distance(x, z) + self.L2_distance(y, z)
+        else:
+            proj_feat = x + y + z
+            proj_feat = self.proj_norm(proj_feat)
+            ans = self.proj(proj_feat)
 
         return ans

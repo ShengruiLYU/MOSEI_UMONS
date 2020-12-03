@@ -73,6 +73,37 @@ class PretrainDataset(Dataset):
         print("unsupervised pretraining!")
 
     def __getitem__(self, idx):
+        return self.get_a_random(idx)
+
+    def get_a_random(self, idx):
+        random_num = random.random()
+
+        if random_num < 0.5:
+            unaligned = False
+        else:
+            unaligned = True
+        
+        key = self.set[idx]
+
+        L = sent_to_ix(self.key_to_sentence[key], self.token_to_ix, max_token=self.l_max_len)
+        V = pad_feature(self.key_to_video[key], self.v_max_len)
+
+        if unaligned:
+            random_key = self.set[np.random.randint(len(self))]
+            A = pad_feature(self.key_to_audio[random_key], self.v_max_len)
+        else:
+            A = pad_feature(self.key_to_audio[key], self.v_max_len)
+
+        y = np.array([])
+        if not self.private_set:
+            if unaligned:
+                y = np.array(0)
+            else:
+                y = np.array(1)
+
+        return key, torch.from_numpy(L), torch.from_numpy(A), torch.from_numpy(V).float(), torch.from_numpy(y).long()        
+
+    def get_v_random(self, idx):
         random_num = random.random()
 
         if random_num < 0.5:

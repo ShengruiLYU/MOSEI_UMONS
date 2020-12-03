@@ -304,9 +304,11 @@ class Model_LA(nn.Module):
         self.attflat_img  = AttFlat(args, 1, merge=True)
         self.attflat_lang = AttFlat(args, 1, merge=True)
 
+        self.proj_norm = LayerNorm(2 * self.args.hidden_size)
+
+    def add_classification_head(self):
         # Classification layers
-        self.proj_norm = LayerNorm(2 * args.hidden_size)
-        self.proj = self.proj = nn.Linear(2 * args.hidden_size, args.ans_size)
+        self.proj = self.proj = nn.Linear(2 * self.args.hidden_size, self.args.ans_size)
 
     def forward(self, x, y, _):
         x_mask = make_mask(x.unsqueeze(2))

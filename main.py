@@ -46,7 +46,7 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=random.randint(0, 9999999))
 
     # Dataset and task
-    parser.add_argument('--dataset', type=str, choices=['MELD', 'MOSEI', 'PRE'], default='MOSEI')
+    parser.add_argument('--dataset', type=str, choices=['MELD', 'MOSEI', 'PRE', 'PRE_SIM'], default='MOSEI')
     parser.add_argument('--task', type=str, choices=['sentiment', 'emotion'], default='sentiment')
     parser.add_argument('--task_binary',default=False, action='store_true')
     parser.add_argument('--pretrain',default=False, action='store_true')

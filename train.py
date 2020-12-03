@@ -15,7 +15,7 @@ def train(net, train_loader, eval_loader, args):
     logfile.write(str(args))
 
     loss_sum = 0
-    best_eval_accuracy = 0.0
+    best_eval_accuracy = float('-inf')
     early_stop = 0
     decay_count = 0
 
@@ -88,7 +88,11 @@ def train(net, train_loader, eval_loader, args):
         # Eval
         if epoch_finish >= args.eval_start:
             print('Evaluation...')
-            accuracy, _ = evaluate(net, eval_loader, args)
+
+            if args.dataset == "PRE_SIM":
+                accuracy = -(loss_sum / len(train_loader.dataset))
+            else:
+                accuracy, _ = evaluate(net, eval_loader, args)
             print('Accuracy :'+str(accuracy))
             eval_accuracies.append(accuracy)
             if accuracy > best_eval_accuracy:
