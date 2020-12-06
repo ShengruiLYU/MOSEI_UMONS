@@ -24,7 +24,8 @@ class Mosei_Dataset(Dataset):
 
         word_file = os.path.join(self.dataroot, "L_" + name + ".pkl")
         audio_file = os.path.join(self.dataroot, "A_" + name + "_MEL.pkl")
-        video_file = os.path.join(self.dataroot, "V_" + name + "_r21d.pkl")
+        #video_file = os.path.join(self.dataroot, "V_" + name + "_r21d.pkl")
+        video_file = os.path.join(self.dataroot, "V_" + name + "_of.pkl")
         y_s_file = os.path.join(self.dataroot, "Y_S_" + name + ".pkl")
         y_e_file = os.path.join(self.dataroot, "Y_E_" + name + ".pkl")
 
@@ -59,7 +60,8 @@ class Mosei_Dataset(Dataset):
         if token_to_ix is not None:
             self.token_to_ix = token_to_ix
         else: # Train
-            self.token_to_ix, self.pretrained_emb = create_dict(self.key_to_sentence, self.dataroot)
+            print("getting tokenized sentences and embeddings")
+            self.token_to_ix, self.pretrained_emb = create_dict(self.key_to_sentence, self.dataroot, True)
         self.vocab_size = len(self.token_to_ix)
 
         self.l_max_len = args.lang_seq_len
