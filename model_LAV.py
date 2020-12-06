@@ -337,6 +337,8 @@ class Model_LAV(nn.Module):
         if self.args.task == "emotion":
             self.proj = self.proj = nn.Linear(2 * args.hidden_size, 6)
 
+        self.cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+
     def forward(self, x, y, z):
         x_mask = make_mask(x.unsqueeze(2))
         y_mask = make_mask(y)
@@ -370,10 +372,16 @@ class Model_LAV(nn.Module):
             z,
             None
         )
+        w_xy = self.cos(x, y)
+        w_xz = self.cos(x, z)
 
+        w_xy[w_xy < 0] = 0
+        w_xz[w_xz < 0] = 0
+        w_xy = w_xy.unsqueeze(1)
+        w_xz = w_xz.unsqueeze(1)
 
         # Classification layers
-        proj_feat = x + y + z
+        proj_feat = x + w_xy*y + w_xz*z
         proj_feat = self.proj_norm(proj_feat)
         ans = self.proj(proj_feat)
 

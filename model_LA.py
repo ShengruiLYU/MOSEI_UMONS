@@ -86,6 +86,8 @@ class Model_LA(nn.Module):
         self.proj_norm = LayerNorm(2 * args.hidden_size)
         self.proj = self.proj = nn.Linear(2 * args.hidden_size, args.ans_size)
 
+        self.cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+
     def forward(self, x, y, _):
         x_mask = make_mask(x.unsqueeze(2))
         y_mask = make_mask(y)
@@ -113,8 +115,11 @@ class Model_LA(nn.Module):
             None
         )
 
+        #calculate cosine similarity as weight for A
+        w_xy = self.cos(x, y)
+        w_xy = w_xy.unsqueeze(1)
         # Classification layers
-        proj_feat = x + y
+        proj_feat = x + w_xy*y
         proj_feat = self.proj_norm(proj_feat)
         ans = self.proj(proj_feat)
 
