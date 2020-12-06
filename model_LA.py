@@ -308,7 +308,12 @@ class Model_LA(nn.Module):
 
     def add_classification_head(self):
         # Classification layers
-        self.proj = self.proj = nn.Linear(2 * self.args.hidden_size, self.args.ans_size)
+        if self.args.dataset != "PRE_SIM":
+            self.proj = self.proj = nn.Linear(2 * self.args.hidden_size, self.args.ans_size)
+    
+    def L2_distance(self, x, y):
+        diff = torch.sub(x, y)
+        return torch.norm(diff)
 
     def forward(self, x, y, _):
         x_mask = make_mask(x.unsqueeze(2))
@@ -338,8 +343,11 @@ class Model_LA(nn.Module):
         )
 
         # Classification layers
-        proj_feat = x + y
-        proj_feat = self.proj_norm(proj_feat)
-        ans = self.proj(proj_feat)
+        if self.args.dataset == "PRE_SIM":
+            ans = self.L2_distance(x, y)
+        else:
+            proj_feat = x + y
+            proj_feat = self.proj_norm(proj_feat)
+            ans = self.proj(proj_feat)
 
         return ans

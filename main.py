@@ -84,8 +84,10 @@ if __name__ == '__main__':
     if args.pretrain:
         ckpts = sorted(glob.glob(os.path.join('./pretrained','best*')), reverse=True)
         state_dict = torch.load(ckpts[0])['state_dict']
-        del state_dict['proj.weight']
-        del state_dict['proj.bias']
+        if 'proj.weight' in state_dict:
+            del state_dict['proj.weight']
+        if 'proj.bias' in state_dict:
+            del state_dict['proj.bias']
         net.load_state_dict(state_dict)
         net.add_classification_head()
 

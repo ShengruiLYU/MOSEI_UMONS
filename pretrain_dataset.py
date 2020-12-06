@@ -73,7 +73,7 @@ class PretrainDataset(Dataset):
         print("unsupervised pretraining!")
 
     def __getitem__(self, idx):
-        return self.get_a_random(idx)
+        return self.get_v_random(idx)
 
     def get_a_random(self, idx):
         random_num = random.random()
